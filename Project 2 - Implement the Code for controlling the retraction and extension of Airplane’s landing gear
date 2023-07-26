@@ -1,0 +1,475 @@
+#include<stdio.h>
+
+#include<stdlib.h>
+
+ 
+
+/* Functions used in our projects*/
+
+void Initial_state_machine(); //function declaration
+
+void Gear_down();
+
+void Checking_before_takeoff();
+
+void Raising_gear();
+
+void Gear_up();
+
+void Checking_before_landing();
+
+void Lowering_gear();
+
+ 
+
+typedef enum states
+
+{
+
+GEAR_DOWN, //ENUM IS USED TO GIVING SUBSEQUENT VALUE FOR EACH STATES
+
+CHECK_BEFORE_TAKEOFF,
+
+RAISING_GEAR,
+
+GEAR_UP,
+
+CHECK_BEFORE_LANDING,
+
+LOWERING_GEAR
+
+}state_type;
+
+typedef enum Switch
+
+{
+
+open, //open=0,close=1;
+
+close //plane is in ground
+
+}Switch_status;
+
+ 
+
+typedef enum pilot_lever
+
+{
+
+raising, //by using enum rising =0,falling=1,up=3and down=4 is assumed
+
+falling,
+
+up,
+
+down
+
+}pilot_lever_status;
+
+ 
+
+typedef enum hydraulic_mechanism
+
+{
+
+working, //here 0 means for working and 1 means for malfunction
+
+malfunctioning
+
+ 
+
+}hydraulic_mechanism_status;
+/* input used in order to change the state */
+
+static volatile Switch_status squat_switch;
+
+static volatile Switch_status limit_switch;
+
+static volatile pilot_lever_status pilot_lever;
+
+static volatile pilot_lever_status hydraulic_mechanism;
+
+ 
+
+state_type current_state;
+
+ 
+
+typedef struct // structure is used to have different types of data type
+
+{
+
+char* current_state_status; //output which we want to visualize are given under structure as structure member.
+
+char* light_status;
+
+char* direction_value_status;
+
+char* hydraulic_pump_ctrl_status;
+
+char* gas_pressurized_spring_status[2];
+
+}state_table;
+
+ 
+
+ 
+
+/* State table of the require system*/
+
+static state_table state_machine[6] = {
+
+{"gear down","green","down","enables",{0,0}},
+
+{"checking before take off","green","down","enabled",{0,0}},
+
+{"raising gear","red","up","enabled",{"disabled","enabled"}},
+
+{"gear up","off","NULL","disabled",{0,0}},
+
+{"checking before landing","red","down","enabled",{0,0}},
+
+{"lowering gear","green","down","enabled",{"disabled","enabled"}}
+
+};
+
+ 
+
+static void(*State_Table[])(void)={Gear_down,Checking_before_takeoff,Raising_gear,
+Gear_up,Checking_before_landing,Lowering_gear};
+
+//initial state machine//
+
+void Initial_state_machine()
+
+{
+
+current_state = GEAR_DOWN; //during initialization, system is at gear down.
+
+printf("\n state machine is initials and at first program is in gear down and its light status is:%s\n",state_machine[current_state].light_status);
+
+ 
+
+}
+
+ 
+
+//Gear down//
+
+void Gear_down(void)
+
+{
+
+current_state =GEAR_DOWN;
+
+printf("\n Enter the pilot's lever position and squat switch status:\n");// getting pilot lever and squat switch value from input
+
+fflush(stdout);
+
+scanf("%d %d",&pilot_lever,&squat_switch);
+
+if(pilot_lever == raising && squat_switch == open) // if pilot lever raising(0) and squar switch is open(0)
+
+{
+
+current_state = CHECK_BEFORE_TAKEOFF;
+
+printf("\n The current state of the machine is: %s\n",state_machine[current_state].current_state_status);// current status value is printed from the state table
+
+printf("\n Light status of the current machine state is:%s\n",state_machine[current_state].light_status);// light status value is taken from state table current state
+
+}
+
+else
+{
+
+Gear_down(); //gear down function is called
+
+}
+
+}
+
+//checking before takeoff//
+
+ 
+
+void Checking_before_takeoff()
+
+{
+
+current_state= CHECK_BEFORE_TAKEOFF; //current state is check before takeoff
+
+printf("\n Enter the pilot lever position, squat switch and hydraulic mechancism:\n");// getting pilot liver, squat switch and hydraulic mechanism as input
+
+fflush(stdout);
+
+scanf("%d %d %d",&pilot_lever, &squat_switch,&hydraulic_mechanism);
+
+printf("\n just wait 2secs\n");
+
+if (pilot_lever == up && squat_switch== close) //pilot lever is up and squat switch is closed it get into the if loop
+
+{
+
+Gear_down(); //gear down function is called
+
+}
+
+else if (pilot_lever== up && squat_switch == open && hydraulic_mechanism == working)//
+
+{
+
+current_state= RAISING_GEAR;
+
+printf("\n Current state: %s\n",state_machine[current_state].current_state_status);
+
+printf("light status: %s\n", state_machine[current_state].light_status);
+
+printf("\n direction status:%s\n\n",state_machine[current_state].direction_value_status);
+
+}
+
+else if (pilot_lever== up && squat_switch == open && hydraulic_mechanism == malfunctioning)
+
+{
+
+current_state= RAISING_GEAR;
+
+printf("\n Current state: %s\n", state_machine[current_state].current_state_status);
+
+printf("\nlight status: %s\n", state_machine[current_state].light_status);
+
+printf("\n direction status:%s\n\n",state_machine[current_state].direction_value_status);
+printf("\n Gas pressurised spring status:%s\n",state_machine[current_state].gas_pressurized_spring_status[hydraulic_mechanism]);
+
+}
+
+}
+
+ 
+
+//raising gear//
+
+void Raising_gear()
+
+{
+
+current_state = RAISING_GEAR;
+
+printf("\n Enter the switch status and pilot lever status:\n");
+
+fflush(stdout);
+
+scanf("%d %d",&limit_switch,&pilot_lever);
+
+printf("\n wait for 1 sec\n");
+
+if(pilot_lever == falling && limit_switch == open)
+
+{
+
+current_state = CHECK_BEFORE_LANDING;
+
+printf("\n current state is:%s\n",state_machine[current_state].current_state_status);
+
+printf("\n Light status:%s\n",state_machine[current_state].light_status);
+
+printf("\nHydraulic condition for landing gear status is %s\n",state_machine[current_state].hydraulic_pump_ctrl_status);
+
+}
+
+else if(limit_switch == close && pilot_lever == up)
+
+{
+
+current_state= GEAR_UP;
+printf("\n current state is:%s\n",state_machine[current_state].current_state_status);
+
+printf("\n Light status:%s\n",state_machine[current_state].light_status);
+
+printf("\nHydraulic condition for landing gear status is %s\n",state_machine[current_state].hydraulic_pump_ctrl_status);
+
+}
+
+else
+
+{
+
+Raising_gear();
+
+}
+
+}
+
+ 
+
+ 
+
+//gear up//
+
+ 
+
+void Gear_up()
+
+{
+
+current_state= GEAR_UP;
+
+printf("\n Enter the pilot lever position :\n");
+
+fflush(stdout);
+
+scanf("%d",&pilot_lever);
+
+ 
+
+if (pilot_lever == falling )
+
+{
+
+current_state= CHECK_BEFORE_LANDING;
+
+printf("\n Current state: %s\n", state_machine[current_state].current_state_status);
+
+printf("\nlight status: %s\n", state_machine[current_state].light_status);
+
+printf("\nHydraulic condition for landing gear status is %s\n",state_machine[current_state].hydraulic_pump_ctrl_status);
+
+}
+
+else
+
+{
+
+Gear_up();
+
+}
+
+}
+
+ 
+
+//checking before landing//
+
+void Checking_before_landing()
+
+{
+
+current_state= CHECK_BEFORE_LANDING;
+
+printf("\n Enter the pilot lever position, status of hydraulic mechanism :\n");
+
+fflush(stdout);
+
+scanf("%d %d",&pilot_lever, &hydraulic_mechanism);
+
+ 
+
+if(pilot_lever == down && hydraulic_mechanism == working)
+
+{
+
+current_state= LOWERING_GEAR;
+
+printf("\n Current state: %s\n", state_machine[current_state].current_state_status);
+
+printf("\nlight status: %s\n", state_machine[current_state].light_status);
+printf("\n direction status:%s\n\n",state_machine[current_state].direction_value_status);
+
+}
+
+else if (pilot_lever== down && hydraulic_mechanism == malfunctioning)
+
+{
+
+current_state= LOWERING_GEAR;
+
+printf("\n Current state: %s\n", state_machine[current_state].current_state_status);
+
+printf("light status: %s\n", state_machine[current_state].light_status);
+
+printf("\n direction status:%s\n\n",state_machine[current_state].direction_value_status);
+
+printf("\n Gas pressurised spring status:%s\n",state_machine[current_state].gas_pressurized_spring_status[hydraulic_mechanism]);
+
+}
+
+if(pilot_lever== (up || raising || falling))
+
+{
+
+Checking_before_landing();
+
+}
+
+}
+
+ 
+
+//lowering gear//
+
+void Lowering_gear()
+
+{
+
+current_state= LOWERING_GEAR;
+
+printf("\n Enter the pilot lever position, limit switch :");
+
+fflush(stdout);
+
+scanf("%d %d",&pilot_lever, &limit_switch);
+if (pilot_lever == raising && limit_switch==close)
+
+{
+
+current_state= CHECK_BEFORE_TAKEOFF;
+
+printf("\n Current state: %s\n", state_machine[current_state].current_state_status);
+
+printf("\nlight status: %s\n", state_machine[current_state].light_status);
+
+}
+
+if (pilot_lever== down && limit_switch == open)
+
+{
+
+current_state= GEAR_DOWN;
+
+printf("\n Current state: %s\n", state_machine[current_state].current_state_status);
+
+printf("\n light status: %s\n", state_machine[current_state].light_status);
+
+printf("\n Hydraulic condition for landing gear status is %s\n",state_machine[current_state].hydraulic_pump_ctrl_status);
+
+}
+
+else
+
+{
+
+Lowering_gear();
+
+}
+
+}
+
+ 
+
+//main function//
+int main()
+
+{
+
+Initial_state_machine();
+
+while(1)
+
+{
+
+State_Table[current_state]();
+
+}
+
+}
