@@ -1,0 +1,111 @@
+#include <iostream>
+using namespace std;
+#define size 2
+#define MAXKM 50000
+class vehicle
+{ public:
+// vehicle()
+//~vehicle()
+public:
+string make,model,type;
+enum TYPE{GAS,ELECTRIC,DIESEL};
+int year;
+float odometer;
+virtual void setmake();
+virtual void putmake();
+virtual void setmodel();
+virtual void putmodel();
+virtual void setyear();
+virtual void putyear();
+virtual void setodometer();
+virtual void putodometer();
+};
+void vehicle::setmake()
+{
+cout<<"Enter make of the vehicle"<<endl;
+cin>>make;
+}
+void vehicle::putmake()
+{
+cout<<"\t"<<make;
+}
+void vehicle::setmodel()
+{
+cout<<"Enter model of the vehicle"<<endl;
+cin>>model;
+}
+void vehicle::putmodel()
+{
+cout<<"\t"<<model;
+}
+void vehicle::setyear()
+{
+cout<<"Enter the manufacture year of the vehicle"<<endl;
+cin>>year;
+}
+void vehicle::putyear()
+{
+cout<<"\t"<<year;
+}
+void vehicle::setodometer()
+{
+cout<<"Float data speedometer of the vehicle"<<endl;
+cin>>odometer;
+}
+void vehicle::putodometer()
+{
+cout<<"\t"<<odometer;
+if(odometer>50000)
+cout<<"\n Tyre rotation to be done"<<endl;
+else
+cout<<"\n Less than 50000 KMS - Tyre rotation can be done in next visit."<<endl;
+}
+
+
+void menudisplay()
+{
+cout<<" 0. Quit.\n";
+cout<<" 1. Displayservices.\n";
+cout<<" 2. Add vehicle.\n";
+}
+void Displayservices()
+{
+cout<<" Oil change or replace oil filter, replace air filter"<<endl;
+cout<<" Replace fuel filter, tire rotations, infotainment debug"<<endl;
+cout<<" Replace spark plugs, replace the cabin filter, check the level"<<endl;
+cout<<" refill the clutch fluid, brake fluid"<<endl;
+cout<<" examine belts, wiper, hoses"<<endl;
+cout<<" Check the tire conditions, check the charging system, battery"<<endl;
+
+}
+
+int main()
+{
+int user_choice;
+beginning: menudisplay();
+cout<<"Enter your choice in no"<<endl;
+cin>>user_choice;
+switch(user_choice)
+{
+case 0 : cout<<"Exiting the program ";
+break;
+case 1 : Displayservices();
+goto beginning;
+case 2 :
+vehicle *pv=new vehicle();
+pv->setmake();
+pv->setmodel();
+pv->setyear();
+pv->setodometer();
+pv->putmake();
+pv->putmodel();
+pv->putyear();
+pv->putodometer();
+
+
+goto beginning;
+
+
+}
+
+}
